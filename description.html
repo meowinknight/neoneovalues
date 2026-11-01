@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoNeoValues - Description</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg" href="icon.svg">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <img id="ideology-icon" src="" alt="" class="desc-icon">
+        <h1 id="ideology-title">Loading...</h1>
+
+        <div class="description-box">
+            <p id="ideology-description"></p>
+        </div>
+
+        <div id="member-section" class="nv-criteria-section" style="display: none;">
+            <h2 id="member-title" class="nv-criteria-title"></h2>
+            <div id="member-box"></div>
+        </div>
+
+        <div id="criteria-section" class="nv-criteria-section" style="display: none;">
+            <h2 id="criteria-title" class="nv-criteria-title">Criteria</h2>
+            <p id="criteria-hint" class="nv-criteria-hint"></p>
+            <div id="criteria-box"></div>
+        </div>
+
+        <div id="howto-section" class="nv-criteria-section" style="display: none;">
+            <h2 id="howto-title" class="nv-criteria-title"></h2>
+            <p id="howto-hint" class="nv-criteria-hint"></p>
+            <div id="howto-box"></div>
+        </div>
+
+        <div class="button-container">
+            <button id="compare-btn" style="display: none;">Compare</button>
+            <button id="icon-source-btn" style="display: none;" onclick="openIconSource()">Original Icon Source</button>
+            <div id="original-work-sign" class="original-work-sign" style="display: none;">Source not provided</div>
+            <button onclick="window.history.back()">Back</button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="criteria.js"></script>
+    <script src="questions_tree.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const itemId = urlParams.get('id');
+        const category = urlParams.get('cat');
+        const type = urlParams.get('type');
+
+        const titleEl = document.getElementById('ideology-title');
+        const descEl = document.getElementById('ideology-description');
+        const iconEl = document.getElementById('ideology-icon');
+        const sourceBtn = document.getElementById('icon-source-btn');
+        const originalSign = document.getElementById('original-work-sign');
+
+        if (!itemId) {
+            titleEl.innerText = "NOT FOUND";
+            descEl.innerText = "No item specified.";
+            iconEl.style.display = 'none';
+            sourceBtn.style.display = 'none';
+            originalSign.style.display = 'none';
+        } else if (type === 'ideology') {
+            titleEl.innerText = itemId.toUpperCase();
+            iconEl.style.display = 'none';
+            sourceBtn.style.display = 'none';
+            originalSign.style.display = 'none';
+            descEl.innerText = descriptions[itemId] || "Description coming soon!";
+
+            // MOD: show the values required for this ideology
+            const critSection = document.getElementById('criteria-section');
+            const critBox = document.getElementById('criteria-box');
+            const critHint = document.getElementById('criteria-hint');
+            let userValues = null;
+            if (urlParams.get('from') === 'results') {
+                try {
+                    const r = urlParams.get('r');
+                    userValues = Object.values(JSON.parse(r || localStorage.getItem('quizResults') || '{}'));
+                } catch (e) {}
+                if (userValues && userValues.length === 0) userValues = null;
+            }
+            critBox.appendChild(nvMakeCriteriaBlock(itemId, userValues));
+            critHint.textContent = userValues
+                ? 'Highlighted values are the ones you got in your quiz.'
+                : 'Values needed to get this ideology.';
+            critSection.style.display = 'block';
+
+            // MOD: answer path for every required value
+            const howtoBox = document.getElementById('howto-box');
+            howtoBox.appendChild(nvMakeIdeologyPathBlock(itemId));
+            if (howtoBox.children.length) {
+                document.getElementById('howto-title').textContent = 'How to get this ideology';
+                document.getElementById('howto-hint').textContent =
+                    'Answer these categories as shown. Other categories can be answered any way, ' +
+                    'but a more specific ideology may take priority if your other answers match it. Click a value to expand.';
+                document.getElementById('howto-section').style.display = 'block';
+            }
+
+            // MOD: compare button (pre-fills "you" when quiz results exist)
+            const cmpBtn = document.getElementById('compare-btn');
+            const myRes = nvGetUserResults();
+            const rParam = nvHasResults(myRes) ? '&r=' + encodeURIComponent(JSON.stringify(myRes)) : '';
+            cmpBtn.textContent = nvHasResults(myRes) ? 'Compare with my results' : 'Compare';
+            cmpBtn.style.display = 'block';
+            cmpBtn.onclick = () => {
+                location.href = nvHasResults(myRes)
+                    ? `compare.html?a=you&b=${encodeURIComponent(itemId)}${rParam}`
+                    : `compare.html?b=${encodeURIComponent(itemId)}`;
+            };
+        } else {
+            const prettyName = (resultsMapping[category] && resultsMapping[category][itemId])
+                                ? resultsMapping[category][itemId]
+                                : itemId.replace(/_/g, ' ');
+
+            titleEl.innerText = prettyName.toUpperCase();
+            iconEl.src = `icons/${category}/${itemId}.svg`;
+            iconEl.onerror = () => { iconEl.style.display = 'none'; };
+            descEl.innerText = descriptions[itemId] || "Description coming soon!";
+
+            // MOD: list every ideology this value is part of
+            const groups = nvIdeologiesForValue(itemId);
+            const total = groups.reduce((n, g) => n + g.names.length, 0);
+            const memberTitle = document.getElementById('member-title');
+            const memberBox = document.getElementById('member-box');
+            memberTitle.textContent = total ? `Part of ${total} ideolog${total === 1 ? 'y' : 'ies'}` : 'Part of no ideologies';
+            groups.forEach(g => {
+                const gt = document.createElement('div');
+                gt.className = 'nv-variant-tag';
+                gt.textContent = g.group;
+                memberBox.appendChild(gt);
+                const row = document.createElement('div');
+                row.className = 'nv-chip-row nv-pill-row';
+                g.names.forEach(name => {
+                    const a = document.createElement('a');
+                    a.className = 'nv-pill';
+                    a.href = `description.html?id=${encodeURIComponent(name)}&type=ideology`;
+                    a.textContent = name;
+                    a.style.backgroundColor = labelColors[name] || '#7a7a7a';
+                    row.appendChild(a);
+                });
+                memberBox.appendChild(row);
+            });
+            document.getElementById('member-section').style.display = 'block';
+
+            // MOD: how to get this value in the quiz
+            const valuePath = nvMakePathBlock(itemId);
+            if (valuePath.children.length) {
+                document.getElementById('howto-title').textContent = 'How to get this value';
+                document.getElementById('howto-hint').textContent = 'The answers that lead to it in the quiz:';
+                document.getElementById('howto-box').appendChild(valuePath);
+                document.getElementById('howto-section').style.display = 'block';
+            }
+
+            if (iconSources[itemId] && iconSources[itemId] !== "") {
+                sourceBtn.style.display = 'block';
+                originalSign.style.display = 'none';
+            } else {
+                sourceBtn.style.display = 'none';
+                originalSign.style.display = 'block';
+            }
+        }
+
+        function openIconSource() {
+            const sourceUrl = iconSources[itemId];
+            if (sourceUrl) window.open(sourceUrl, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoNeoValues - All Values</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg" href="icon.svg">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <h1>All Values</h1>
+        <p class="intro-text">Below is a collection of all values included in NeoNeoValues. Click on any icon to view its detailed description and original source.</p>
+        <div class="nv-filters">
+            <input id="f-search" class="nv-input" type="search" placeholder="Search values&hellip;" autocomplete="off">
+            <div class="nv-filter-row">
+                <select id="f-cat" class="nv-input"><option value="">All categories</option></select>
+            </div>
+            <div class="nv-filter-foot">
+                <span id="f-count"></span>
+                <a id="f-clear" class="nv-change" href="#" style="display: none;">Clear filters</a>
+            </div>
+        </div>
+        <div id="values-container"></div>
+        <div id="buttons" style="margin-top: 40px; padding-bottom: 60px;">
+            <button onclick="location.href='index.html'">Back</button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="criteria.js"></script>
+
+    <script>
+        const container = document.getElementById('values-container');
+        const items = [];   // { el, name }
+        const secs = [];    // { el, items[], cat }
+
+        for (const category in resultsMapping) {
+            const section = document.createElement('div');
+            section.className = 'category-section';
+
+            const title = document.createElement('h2');
+            title.className = 'category-title';
+            title.innerText = categoryTitles[category] || category;
+            
+            section.appendChild(title);
+
+            const flexContainer = document.createElement('div');
+            flexContainer.className = 'values-flex-container';
+            const secRec = { el: section, items: [], cat: category };
+
+            for (const id in resultsMapping[category]) {
+                const wrapper = document.createElement('a');
+                wrapper.className = 'result-item'; 
+                wrapper.href = `description.html?id=${id}&cat=${category}`;
+                wrapper.style.textDecoration = 'none';
+                wrapper.style.color = 'inherit';
+
+                const img = document.createElement('img');
+                img.src = `icons/${category}/${id}.svg`;
+                img.className = 'result-icon'; 
+                img.alt = resultsMapping[category][id];
+
+                const name = document.createElement('p');
+                name.innerText = resultsMapping[category][id];
+                name.className = 'result-text'; 
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(name);
+                flexContainer.appendChild(wrapper);
+                const rec = { el: wrapper, name: resultsMapping[category][id].toLowerCase() };
+                items.push(rec); secRec.items.push(rec);
+            }
+
+            section.appendChild(flexContainer);
+            container.appendChild(section);
+            secs.push(secRec);
+        }
+
+        // ----- search + category filter -----
+        const fSearch = document.getElementById('f-search');
+        const fCat = document.getElementById('f-cat');
+        const fCount = document.getElementById('f-count');
+        const fClear = document.getElementById('f-clear');
+        Object.keys(resultsMapping).forEach(c => {
+            const o = document.createElement('option'); o.value = c; o.textContent = categoryTitles[c] || c; fCat.appendChild(o);
+        });
+        function apply() {
+            const q = fSearch.value.trim().toLowerCase();
+            const cat = fCat.value;
+            let shown = 0;
+            secs.forEach(s => {
+                let any = false;
+                s.items.forEach(it => {
+                    const ok = (!cat || s.cat === cat) && (!q || it.name.includes(q));
+                    it.el.style.display = ok ? '' : 'none';
+                    if (ok) { any = true; shown++; }
+                });
+                s.el.style.display = any ? '' : 'none';
+            });
+            const active = q || cat;
+            fCount.textContent = active ? `Showing ${shown} of ${items.length} values` : `${items.length} values`;
+            fClear.style.display = active ? '' : 'none';
+        }
+        fSearch.addEventListener('input', apply);
+        fCat.addEventListener('change', apply);
+        fClear.addEventListener('click', ev => { ev.preventDefault(); fSearch.value = ''; fCat.value = ''; apply(); });
+        apply();
+    </script>
+</body>
+</html>

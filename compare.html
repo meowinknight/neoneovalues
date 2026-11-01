@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoNeoValues - Compare</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg" href="icon.svg">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Compare</h1>
+        <p class="intro-text">Pick two ideologies, or compare one with your own quiz results, to see which values they share.</p>
+
+        <div class="nv-cmp-pickers">
+            <label class="nv-cmp-picker">
+                <span>Left</span>
+                <input id="pick-a" class="nv-input" list="cmp-options" placeholder="Choose an ideology or You…" autocomplete="off">
+            </label>
+            <button id="swap-btn" class="nv-swap" title="Swap sides" aria-label="Swap sides">&#8644;</button>
+            <label class="nv-cmp-picker">
+                <span>Right</span>
+                <input id="pick-b" class="nv-input" list="cmp-options" placeholder="Choose an ideology or You…" autocomplete="off">
+            </label>
+        </div>
+        <datalist id="cmp-options"></datalist>
+
+        <div id="cmp-message" class="nv-cmp-message"></div>
+        <div id="cmp-output" style="width: 100%; max-width: 860px;"></div>
+
+        <div id="buttons" style="margin-top: 30px; padding-bottom: 60px;">
+            <button id="back-results" style="display: none;">Back to my results</button>
+            <button onclick="location.href='index.html'">Back to menu</button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="criteria.js"></script>
+    <script>
+        const YOU_LABEL = 'You (my quiz results)';
+        const params = new URLSearchParams(window.location.search);
+        const userRes = nvGetUserResults();
+        const hasRes = nvHasResults(userRes);
+        const resParam = hasRes ? encodeURIComponent(JSON.stringify(userRes)) : '';
+        const ideologies = nvAllIdeologies().sort((a, b) => a.localeCompare(b));
+
+        const dl = document.getElementById('cmp-options');
+        const addOpt = v => { const o = document.createElement('option'); o.value = v; dl.appendChild(o); };
+        if (hasRes) addOpt(YOU_LABEL);
+        ideologies.forEach(addOpt);
+
+        const inA = document.getElementById('pick-a');
+        const inB = document.getElementById('pick-b');
+        const out = document.getElementById('cmp-output');
+        const msg = document.getElementById('cmp-message');
+
+        // turn typed text into a spec: 'you' | ideology name | null
+        function parseSpec(text) {
+            const t = (text || '').trim().toLowerCase();
+            if (!t) return null;
+            if (t === 'you' || t === YOU_LABEL.toLowerCase()) return 'you';
+            return ideologies.find(n => n.toLowerCase() === t) || null;
+        }
+        function specLabel(spec) { return spec === 'you' ? YOU_LABEL : spec; }
+
+        function headerBubble(spec) {
+            const el = document.createElement(spec === 'you' ? 'div' : 'a');
+            el.className = 'nv-pill nv-cmp-name';
+            el.textContent = spec === 'you' ? 'You' : spec;
+            el.style.backgroundColor = spec === 'you' ? '#5c5c5c' : (labelColors[spec] || '#7a7a7a');
+            if (spec !== 'you') el.href = `description.html?id=${encodeURIComponent(spec)}&type=ideology`;
+            return el;
+        }
+
+        function valueCell(id, status) {
+            const cell = document.createElement('div');
+            cell.className = 'nv-cmp-cell';
+            if (!id) { const s = document.createElement('span'); s.className = 'nv-cmp-any'; s.textContent = 'any'; cell.appendChild(s); return cell; }
+            const chip = nvMakeChip(id, status === 'shared' ? 'match' : (status === 'differ' ? 'diff' : null), true);
+            if (chip) cell.appendChild(chip);
+            return cell;
+        }
+
+        function syncUrl() {
+            const q = new URLSearchParams();
+            const a = parseSpec(inA.value), b = parseSpec(inB.value);
+            if (a) q.set('a', a === 'you' ? 'you' : a);
+            if (b) q.set('b', b === 'you' ? 'you' : b);
+            if (hasRes) q.set('r', JSON.stringify(userRes));
+            try { history.replaceState(null, '', location.pathname + '?' + q.toString()); } catch (e) {}
+        }
+
+        function render() {
+            out.innerHTML = ''; msg.textContent = '';
+            const a = parseSpec(inA.value), b = parseSpec(inB.value);
+            syncUrl();
+            if ((inA.value && !a) || (inB.value && !b)) { msg.textContent = 'No ideology with that exact name — pick one from the list.'; return; }
+            if (!a || !b) { msg.textContent = 'Choose both sides to compare.'; return; }
+            if ((a === 'you' || b === 'you') && !hasRes) { msg.textContent = 'No quiz results found yet — take the quiz first.'; return; }
+
+            const cmp = nvCompareSides(a, b, userRes);
+            if (!cmp) { msg.textContent = 'Nothing to compare.'; return; }
+
+            const head = document.createElement('div');
+            head.className = 'nv-cmp-head';
+            head.appendChild(headerBubble(a));
+            const vs = document.createElement('span'); vs.className = 'nv-cmp-vs'; vs.textContent = 'vs'; head.appendChild(vs);
+            head.appendChild(headerBubble(b));
+            out.appendChild(head);
+
+            const sum = document.createElement('div');
+            sum.className = 'nv-cmp-summary';
+            const both = cmp.shared + cmp.differ;
+            const pct = both ? Math.round(100 * cmp.shared / both) : null;
+            sum.innerHTML =
+                `<span class="nv-tag nv-tag-shared">${cmp.shared} shared</span>` +
+                `<span class="nv-tag nv-tag-differ">${cmp.differ} different</span>` +
+                `<span class="nv-tag">${cmp.onlyOne} only one side specifies</span>` +
+                (pct === null ? '' : `<div class="nv-cmp-pct">Agree on ${pct}% of the categories both define</div>`);
+            out.appendChild(sum);
+
+            const notes = [];
+            if (cmp.na > 1) notes.push(`${specLabel(a)} has ${cmp.na} variants \u2014 showing variant ${cmp.ia + 1}, the closest to the other side.`);
+            if (cmp.nb > 1) notes.push(`${specLabel(b)} has ${cmp.nb} variants \u2014 showing variant ${cmp.ib + 1}, the closest to the other side.`);
+            notes.forEach(n => { const p = document.createElement('p'); p.className = 'nv-criteria-hint'; p.style.textAlign = 'center'; p.textContent = n; out.appendChild(p); });
+
+            const table = document.createElement('div');
+            table.className = 'nv-cmp-table';
+            cmp.rows.forEach(row => {
+                const r = document.createElement('div');
+                r.className = 'nv-cmp-row nv-cmp-' + row.status;
+                r.appendChild(valueCell(row.a, row.status));
+                const mid = document.createElement('div');
+                mid.className = 'nv-cmp-cat';
+                const sym = { shared: '=', differ: '\u2260', one: '\u00B7', none: '\u00B7' }[row.status];
+                mid.innerHTML = `<span class="nv-cmp-sym">${sym}</span><span>${categoryTitles[row.cat] || row.cat}</span>`;
+                r.appendChild(mid);
+                r.appendChild(valueCell(row.b, row.status));
+                table.appendChild(r);
+            });
+            out.appendChild(table);
+        }
+
+        // initial state from URL
+        const pa = params.get('a'), pb = params.get('b');
+        inA.value = pa ? specLabel(parseSpec(pa) || pa) : (hasRes ? YOU_LABEL : '');
+        inB.value = pb ? specLabel(parseSpec(pb) || pb) : '';
+        ['change', 'input'].forEach(ev => { inA.addEventListener(ev, render); inB.addEventListener(ev, render); });
+        document.getElementById('swap-btn').onclick = () => { const t = inA.value; inA.value = inB.value; inB.value = t; render(); };
+        if (hasRes) {
+            const br = document.getElementById('back-results');
+            br.style.display = 'block';
+            br.onclick = () => { location.href = `results.html?r=${resParam}`; };
+        }
+        render();
+    </script>
+</body>
+</html>
