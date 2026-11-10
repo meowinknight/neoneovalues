@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
+<svg fill="#1b1b1b"
    width="1000"
    height="1000"
    viewBox="0 0 264.58333 264.58333"
@@ -37,12 +37,12 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"><circle
-       style="fill:#000000;fill-opacity:1;stroke:#ea8a12;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+       style="fill:#1b1b1b;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        id="path236"
        cx="132.29167"
        cy="132.29167"
        r="125.37917" /><circle
-       style="fill:#427328;fill-opacity:0;stroke:#ffffff;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path236-3"
        cx="132.29167"
        cy="132.29167"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
+<svg fill="#7bbe7d"
    width="1000"
    height="1000"
    viewBox="0 0 264.58333 264.58333"
@@ -65,12 +65,12 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"><circle
-       style="fill:#7bbe7d;fill-opacity:1;stroke:#0c7510;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#1b1b1b;fill-opacity:1;stroke:#7bbe7d;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path236-3"
        r="125.37917"
        cy="132.29167"
        cx="132.29167" /><path
-       fill="currentColor"
+       fill="#7bbe7d"
        d="M 170.9122,97.532821 C 101.3954,112.9811 85.174677,160.63875 69.108671,200.57212 l 14.598454,5.09805 7.33776,-17.76537 c 3.707558,1.31371 7.569844,2.31796 10.350515,2.31796 84.96478,0 108.13705,-131.3096 108.13705,-131.3096 -7.724,15.448276 -61.79252,17.379425 -100.41305,25.10341 -38.620539,7.723991 -54.068521,40.55139 -54.068521,55.99966 0,15.44828 13.51713,28.9654 13.51713,28.9654 C 93.671126,97.533703 170.9122,97.533703 170.9122,97.533703"
        id="path2363"
-       style="stroke-width:7.72407;fill:#0c7510;fill-opacity:1" /></g></svg>
+       style="stroke-width:7.72407;fill:#7bbe7d;fill-opacity:1" /></g></svg>

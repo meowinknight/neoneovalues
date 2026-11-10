@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
+<svg fill="#b44c4c"
    width="1000"
    height="1000"
    viewBox="0 0 264.58333 264.58333"
@@ -65,14 +65,14 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"><circle
-       style="fill:#9b4141;fill-opacity:1;stroke:#000000;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#1b1b1b;fill-opacity:1;stroke:#b44c4c;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path236-3"
        r="125.37917"
        cy="132.29167"
        cx="132.29167" /><g
        id="g13423"
        transform="translate(-7.0835157,-7.9413581)"><path
-         fill="currentColor"
+         fill="#b44c4c"
          d="m 105.31294,187.85411 v -72.85804 l 35.19051,-14.98415 v 13.80866 l 35.19024,-14.21697 v 17.86977 h 56.30475 v 70.38073 z m 57.9234,-24.3659 h 10.8387 v -21.64892 h -10.8387 z m -28.15223,0 h 10.83869 v -21.64892 h -10.83869 z m 56.30447,0 h 10.83869 v -21.64892 h -10.83869 z m 39.74427,-52.24364 h -20.23457 l 6.25673,-44.663517 h 8.6218 z"
          id="path11613"
          style="stroke-width:7.03808" /><path

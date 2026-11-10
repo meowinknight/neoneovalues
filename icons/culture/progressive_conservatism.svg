@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
+<svg fill="#419fcc"
    width="1000"
    height="1000"
    viewBox="0 0 264.58333 264.58333"
@@ -38,12 +38,12 @@
      inkscape:groupmode="layer"
      id="layer1"><path
        id="path236"
-       style="fill:#53db32;fill-opacity:1;stroke:#ea8a12;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+       style="fill:#419fcc;fill-opacity:1;stroke:#419fcc;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        d="M 220.42169 43.123465 A 125.37917 125.37917 0 0 0 132.29166 6.9127563 A 125.37917 125.37917 0 0 0 6.9127563 132.29166 A 125.37917 125.37917 0 0 0 42.813924 220.00311 L 220.42169 43.123465 z " /><path
        id="path14860"
-       style="fill:#419fcc;fill-opacity:1;stroke:#ea8a12;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+       style="fill:#1b1b1b;fill-opacity:1;stroke:#419fcc;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        d="M 220.42169 43.123465 L 42.813924 220.00311 A 125.37917 125.37917 0 0 0 132.29166 257.67109 A 125.37917 125.37917 0 0 0 257.67109 132.29166 A 125.37917 125.37917 0 0 0 220.42169 43.123465 z " /><circle
-       style="fill:#427328;fill-opacity:0;stroke:#505050;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#419fcc;fill-opacity:0;stroke:#419fcc;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path236-3"
        cx="132.29167"
        cy="132.29167"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
+<svg fill="#1b1b1b"
    width="1000"
    height="1000"
    viewBox="0 0 264.58333 264.58333"
@@ -41,36 +41,36 @@
        inkscape:persp3d-origin="407.5 : 368.33333 : 1"
        id="perspective11259" /><linearGradient
        id="linearGradient5938"><stop
-         style="stop-color:#000000;stop-opacity:1;"
+         style="stop-color:#1b1b1b;stop-opacity:1;"
          offset="0"
          id="stop5940" /><stop
          id="stop5946"
          offset="0.5"
-         style="stop-color:#000000;stop-opacity:0;" /><stop
-         style="stop-color:#000000;stop-opacity:1;"
+         style="stop-color:#1b1b1b;stop-opacity:0;" /><stop
+         style="stop-color:#1b1b1b;stop-opacity:1;"
          offset="1"
          id="stop5942" /></linearGradient><linearGradient
        id="linearGradient5196"><stop
-         style="stop-color:#860909;stop-opacity:1;"
+         style="stop-color:#f1cc19;stop-opacity:1;"
          offset="0"
          id="stop5198" /><stop
-         style="stop-color:#bb0d0d;stop-opacity:1;"
+         style="stop-color:#f1cc19;stop-opacity:1;"
          offset="1"
          id="stop5200" /></linearGradient><linearGradient
        id="linearGradient7546"><stop
-         style="stop-color:#6d0000;stop-opacity:1;"
+         style="stop-color:#1b1b1b;stop-opacity:1;"
          offset="0"
          id="stop7548" /><stop
-         style="stop-color:#8a0000;stop-opacity:0;"
+         style="stop-color:#f1cc19;stop-opacity:0;"
          offset="1"
          id="stop7550" /></linearGradient><linearGradient
        id="linearGradient13829"><stop
          id="stop13831"
          offset="0.00000000"
-         style="stop-color:#ffffff;stop-opacity:1.0000000;" /><stop
+         style="stop-color:#f1cc19;stop-opacity:1.0000000;" /><stop
          id="stop13833"
          offset="1.0000000"
-         style="stop-color:#c9c9c9;stop-opacity:1.0000000;" /></linearGradient><linearGradient
+         style="stop-color:#f1cc19;stop-opacity:1.0000000;" /></linearGradient><linearGradient
        id="linearGradient15699"><stop
          style="stop-color:black;stop-opacity:0.78431374;"
          offset="0"
@@ -83,12 +83,12 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"><circle
-       style="fill:#1d1d1d;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+       style="fill:#1b1b1b;fill-opacity:1;stroke:#1b1b1b;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        id="path236"
        cx="132.29167"
        cy="132.29167"
        r="125.37917" /><circle
-       style="fill:#ffffff;fill-opacity:0;stroke:#f1cc19;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#f1cc19;fill-opacity:0;stroke:#f1cc19;stroke-width:5.29167;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path236-3"
        cx="132.29167"
        cy="132.29167"
