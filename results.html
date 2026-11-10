@@ -4,13 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeoNeoValues</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/svg" href="icon.svg">
-    <script src="theme.js"></script>
+    <link rel="stylesheet" href="style.css?v=1790fb93">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <script src="theme.js?v=1790fb93"></script>
+    <meta name="description" content="A political ideology quiz: find your match among 190+ ideologies, with the full criteria for every value and ideology.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="NeoNeoValues">
+    <meta property="og:title" content="NeoNeoValues - find your political ideology">
+    <meta property="og:description" content="Answer questions across 9 categories and see which of 190+ ideologies fits you, with the full criteria for every result.">
+    <meta property="og:image" content="og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NeoNeoValues - find your political ideology">
+    <meta name="twitter:description" content="Answer questions across 9 categories and see which of 190+ ideologies fits you.">
+    <meta name="twitter:image" content="og-image.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#18181b">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <script src="pwa.js?v=1790fb93"></script>
 </head>
 <body>
     <div class="main-container">
     <div class="main-results-wrapper">
+        <div id="shared-banner" class="nv-redo-banner" style="display: none; margin: 0 auto 14px;">
+            You're viewing shared results. <a href="Instruction.html" id="shared-quiz-link">Take the quiz yourself</a>
+        </div>
         <div class="top-section">
             <div class="title-container">
                 <h1>NeoNeoValues</h1>
@@ -28,34 +47,73 @@
                 <div id="closest-list"></div>
             </div>
 
-            <p class="intro-text results-instruction">
+            <p class="intro-text results-instruction" id="results-instruction">
                 Click on any icon or label to view its description and original source.
                 Use "Change" under an icon to redo just that category.
             </p>
 
             <div id="buttons" style="margin-top: 30px;">
                 <button id="export-btn">Export as PNG</button>
+                <button id="share-btn" style="display: none;">Copy link to my results</button>
                 <button id="compare-btn">Compare with an ideology</button>
+                <button id="builder-btn">Tweak in the builder</button>
                 <button onclick="location.href='index.html'">Back to menu</button>
             </div>
         </div>
     </div>
 
-    <script src="data.js"></script>
-    <script src="criteria.js"></script>
-    <script src="export.js"></script>
+    <script src="data.js?v=1790fb93"></script>
+    <script src="mods.js?v=1790fb93"></script>
+    <script src="criteria.js?v=1790fb93"></script>
+    <script src="export.js?v=1790fb93"></script>
+    <script src="share.js?v=1790fb93"></script>
     <script>
-        // Read results from the URL first (works everywhere), then from localStorage
+        // If a site file did not load (partial upload, stale copy), say which one instead of showing a blank page.
+        (function () {
+            const problems = [];
+            const dataOk = typeof categories !== 'undefined' && typeof categoryTitles !== 'undefined' &&
+                typeof resultsMapping !== 'undefined' && typeof labelMapping !== 'undefined' &&
+                typeof labelColors !== 'undefined' && typeof ideologyGroups !== 'undefined' &&
+                typeof subCategories !== 'undefined';
+            const helpersOk = typeof nvGetUserResults === 'function' && typeof nvDecodeResults === 'function' &&
+                typeof nvSanitizeResults === 'function' && typeof nvEncodeResults === 'function' &&
+                typeof nvClosestIdeologies === 'function' && typeof nvMakeChip === 'function';
+            if (!dataOk) problems.push('data.js is missing, cut off, or an older version');
+            if (!helpersOk) problems.push('criteria.js is missing, cut off, or an older version');
+            if (!problems.length) return;
+            const box = document.createElement('div');
+            box.className = 'nv-warning';
+            box.style.margin = '20px auto';
+            box.appendChild(document.createTextNode('Part of the site is missing or out of date: ' + problems.join('; ') + '. Upload it again from the latest zip and reload. '));
+            const link = document.createElement('a');
+            link.href = 'check.html';
+            link.textContent = 'Run the file check';
+            link.style.fontWeight = '700';
+            box.appendChild(link);
+            box.appendChild(document.createTextNode(' to see every file.'));
+            const container = document.getElementById('results-container');
+            container.parentNode.insertBefore(box, container);
+            const generic = document.getElementById('nv-site-problem');   // this notice is more specific, so drop the generic banner
+            if (generic) generic.remove();
+            document.getElementById('export-btn').style.display = 'none';
+            throw new Error('site files missing');
+        })();
+
+        // Results come from: a shared link (?s=), an internal link (?r=), or this device's saved results.
+        // A shared link is only displayed; it never overwrites the viewer's own saved results.
+        const urlParams = new URLSearchParams(window.location.search);
+        const isShared = urlParams.has('s');
         const results = (function () {
-            try {
-                const r = new URLSearchParams(window.location.search).get('r');
-                if (r) {
-                    const parsed = JSON.parse(r);
+            if (isShared) return nvDecodeResults(urlParams.get('s'));
+            const fromUrl = urlParams.get('r');
+            if (fromUrl) {
+                try {
+                    const parsed = nvSanitizeResults(JSON.parse(fromUrl));
                     try { localStorage.setItem('quizResults', JSON.stringify(parsed)); } catch (e) {}
                     return parsed;
-                }
-            } catch (e) {}
-            try { return JSON.parse(localStorage.getItem('quizResults') || '{}'); } catch (e) { return {}; }
+                } catch (e) {}
+            }
+            return nvGetUserResults();
         })();
         const resultsParam = encodeURIComponent(JSON.stringify(results));
         const container = document.getElementById('results-container');
@@ -90,13 +148,15 @@
             wrapper.appendChild(name);
             cell.appendChild(wrapper);
 
-            // Redo just this category
+            // Redo just this category (not offered on someone else's shared results)
+            if (!isShared) {
             const change = document.createElement('a');
             change.className = 'nv-change';
             change.href = `quiz.html?redo=${category}&r=${resultsParam}`;
             change.textContent = '\u21BB Change';
             change.title = `Redo only the ${categoryTitles[category] || category} questions`;
             cell.appendChild(change);
+            }
 
             container.appendChild(cell);
         });
@@ -174,6 +234,7 @@
         const exportBtn = document.getElementById('export-btn');
         if (!categories.some(c => results[c])) exportBtn.style.display = 'none';
         exportBtn.onclick = async () => {
+            if (typeof nvRenderResultsPng !== 'function') { alert('export.js did not load, so the image cannot be created. Upload it again and reload.'); return; }
             const original = exportBtn.textContent;
             exportBtn.disabled = true;
             exportBtn.textContent = 'Rendering image\u2026';
@@ -205,6 +266,26 @@
             }
         };
 
+        // ----- share link (only meaningful on a real website, not a file on disk) -----
+        const shareBtn = document.getElementById('share-btn');
+        if ((location.protocol === 'http:' || location.protocol === 'https:') && categories.some(c => results[c])) {
+            shareBtn.style.display = '';
+            shareBtn.onclick = () => {
+                if (typeof nvShowShareLink !== 'function') { alert('share.js did not load. Upload it again and reload.'); return; }
+                nvShowShareLink(nvBuildShareUrl(results));
+            };
+        }
+
+        // ----- someone else's results -----
+        if (isShared) {
+            document.getElementById('shared-banner').style.display = 'block';
+            const ins = document.getElementById('results-instruction');
+            ins.textContent = 'Click on any icon or label to view its description and original source.';
+        }
+
+        document.getElementById('builder-btn').onclick = () => {
+            location.href = 'builder.html?s=' + encodeURIComponent(nvEncodeResults(results)).replace(/%2C/g, ',');
+        };
         document.getElementById('compare-btn').onclick = () => {
             location.href = `compare.html?a=you${matchedKey ? '&b=' + encodeURIComponent(finalLabel) : ''}&r=${resultsParam}`;
         };

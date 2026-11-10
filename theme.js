@@ -83,3 +83,39 @@
         document.body.prepend(toggleBtn);
     });
 })();
+
+/* If a site file fails to load, or a script crashes because one is missing or out of date, say so on any page
+   (the quiz page has its own notice). The message links to the file check. */
+(function () {
+    var shown = [];
+    function fname(u) { return String(u || '').split('/').pop().split('?')[0]; }
+    function banner() {
+        if (document.getElementById('quiz-warning') || document.querySelector('.nv-warning') || !document.body) return;
+        var el = document.getElementById('nv-site-problem');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'nv-site-problem';
+            el.setAttribute('role', 'alert');
+            el.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:3000;padding:12px 16px;background:#7f1d1d;color:#fff;' +
+                'font:14px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;text-align:center';
+            document.body.appendChild(el);
+        }
+        el.textContent = '';
+        el.appendChild(document.createTextNode('Part of the site did not load properly (' + shown.join('; ') + '). Reload the page, or '));
+        var a = document.createElement('a');
+        a.href = 'check.html'; a.textContent = 'run the file check';
+        a.style.cssText = 'color:#fff;font-weight:700';
+        el.appendChild(a);
+        el.appendChild(document.createTextNode('.'));
+    }
+    window.addEventListener('error', function (e) {
+        var t = e.target, msg;
+        if (t && t.tagName === 'SCRIPT' && t.src) msg = fname(t.src) + ' could not be loaded';
+        else if (e.message && !/site files missing/.test(e.message) &&
+                 /is not defined|is not a function|Unexpected|Invalid or unexpected/.test(e.message)) {
+            msg = fname(e.filename) + ': ' + String(e.message).replace(/^Uncaught\s*/, '');
+        } else return;
+        if (shown.length < 3 && shown.indexOf(msg) < 0) shown.push(msg);
+        if (document.body) banner(); else document.addEventListener('DOMContentLoaded', banner);
+    }, true);
+})();

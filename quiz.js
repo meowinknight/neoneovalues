@@ -13,6 +13,7 @@ const redoCategory = quizParams.get('redo');
 let originalResultsParam = quizParams.get('r');
 if (redoCategory && categoryOrder.includes(redoCategory)) {
   try { results = JSON.parse(originalResultsParam || '{}') || {}; } catch (e) { results = {}; }
+  if (typeof nvSanitizeResults === 'function') results = nvSanitizeResults(results);
   categoryOrder = [redoCategory];
 }
 
@@ -29,8 +30,22 @@ function showRedoBanner() {
   banner.style.display = 'block';
 }
 
+// MOD: files that loaded but are out of date or empty (for example after a partial upload)
+function checkSiteFiles() {
+  const missing = [];
+  if (typeof resultsMapping === 'undefined' || typeof categoryTitles === 'undefined' ||
+      typeof labelMapping === 'undefined' || typeof ideologyGroups === 'undefined' ||
+      typeof descriptions === 'undefined') missing.push('data.js');
+  if (typeof nvMakeOutcomeBox !== 'function' || typeof nvReachableLeaves !== 'function') missing.push('criteria.js');
+  if (missing.length && window.nvShowQuizWarning) {   // this list is more precise than the generic notice, so it replaces it
+    window.nvShowQuizWarning('Part of the site is missing or out of date (' + missing.join(', ') + '). The quiz still works, ' +
+      'but the value previews are off, and your results page needs these files. Upload them again and reload.');
+  }
+}
+
 function startQuiz(data) {
   questionsByCategory = data;
+  checkSiteFiles();
   showRedoBanner();
   startCategory(categoryOrder[currentCategoryIndex]);
 }
@@ -95,6 +110,65 @@ function selectOption(nextId) {
   }
 }
 
+// MOD: progress indicator ("Category 3 of 9" + a bar), refreshed on every question
+function updateProgress(optionCount) {
+  const box = document.getElementById('quiz-progress');
+  if (!box) return;
+  const total = categoryOrder.length;
+  const idx = currentCategoryIndex;
+  const category = categoryOrder[idx];
+  const title = (typeof categoryTitles !== 'undefined' && categoryTitles[category]) || category.replace(/_/g, ' ');
+  const questionNumber = answerHistory.filter(h => h.catIndex === idx).length + 1;
+
+  box.textContent = '';
+
+  const top = document.createElement('div');
+  top.className = 'nv-progress-top';
+  const left = document.createElement('span');
+  left.className = 'nv-progress-title';
+  left.textContent = title;
+  const right = document.createElement('span');
+  right.textContent = (total > 1 ? 'Category ' + (idx + 1) + ' of ' + total + ' \u00B7 ' : '') + 'Question ' + questionNumber;
+  top.appendChild(left);
+  top.appendChild(right);
+  box.appendChild(top);
+
+  const bar = document.createElement('div');
+  bar.className = 'nv-progress-bar';
+  for (let i = 0; i < total; i++) {
+    const seg = document.createElement('span');
+    seg.className = i < idx ? 'done' : (i === idx ? 'current' : '');
+    bar.appendChild(seg);
+  }
+  bar.setAttribute('role', 'progressbar');
+  bar.setAttribute('aria-valuemin', '1');
+  bar.setAttribute('aria-valuemax', String(total));
+  bar.setAttribute('aria-valuenow', String(idx + 1));
+  box.appendChild(bar);
+
+  const hint = document.createElement('div');
+  hint.className = 'nv-kbd-hint';
+  hint.textContent = 'Tip: press 1\u2013' + optionCount + ' to answer' + (answerHistory.length ? ', \u2190 to go back' : '');
+  box.appendChild(hint);
+
+  box.style.display = 'block';
+}
+
+// MOD: keyboard shortcuts: number keys pick an answer, left arrow / backspace goes back
+document.addEventListener('keydown', function (e) {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  const tag = ((e.target && e.target.tagName) || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if (/^[1-9]$/.test(e.key)) {
+    const answers = document.querySelectorAll('#buttons button.nv-answer');
+    const target = answers[Number(e.key) - 1];
+    if (target) { e.preventDefault(); target.click(); }
+  } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+    const prev = document.querySelector('#buttons button.nv-prev');
+    if (prev) { e.preventDefault(); prev.click(); }
+  }
+});
+
 function renderNode(node) {
   const questionEl = document.getElementById('question');
   const buttonsDiv = document.getElementById('buttons');
@@ -108,14 +182,21 @@ function renderNode(node) {
   node.options.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'nv-answer';
+    const keyBadge = document.createElement('span');
+    keyBadge.className = 'nv-key';
+    keyBadge.setAttribute('aria-hidden', 'true');
+    keyBadge.textContent = String(node.options.indexOf(opt) + 1);
+    btn.appendChild(keyBadge);
     const textSpan = document.createElement('span');
     textSpan.className = 'nv-answer-text';
     textSpan.innerText = opt.text;
     btn.appendChild(textSpan);
-    // MOD: show the icon + name of the value(s) this answer leads to
-    const leaves = nvReachableLeaves(currentQuestions, opt.next);
-    const outcomeBox = nvMakeOutcomeBox(leaves);
-    if (outcomeBox) btn.appendChild(outcomeBox);
+    // MOD: show the icon + name of the value(s) this answer leads to.
+    // If the helper files did not load, skip the previews instead of hiding the answers.
+    try {
+      const outcomeBox = nvMakeOutcomeBox(nvReachableLeaves(currentQuestions, opt.next));
+      if (outcomeBox) btn.appendChild(outcomeBox);
+    } catch (err) { /* previews are optional */ }
     if (opt.color) btn.style.backgroundColor = opt.color;
     btn.onclick = () => selectOption(opt.next);
     buttonsDiv.appendChild(btn);
@@ -128,4 +209,5 @@ function renderNode(node) {
     prevBtn.onclick = goBack;
     buttonsDiv.appendChild(prevBtn);
   }
+  try { updateProgress(node.options.length); } catch (err) { /* the progress bar is optional */ }
 }

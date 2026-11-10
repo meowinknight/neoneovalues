@@ -4,23 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeoNeoValues - Quiz</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/svg" href="icon.svg">
-    <script src="theme.js"></script>
+    <link rel="stylesheet" href="style.css?v=1790fb93">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <script src="theme.js?v=1790fb93"></script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#18181b">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <script src="pwa.js?v=1790fb93"></script>
 </head>
 <body>
     <div class="main-container">
+    <div id="quiz-warning" class="nv-warning" style="display: none;"></div>
+    <script>
+    /* If a site file fails to load or is broken, say which one instead of leaving the page half-empty. */
+    (function () {
+        var problems = [];
+        function name(url) { return String(url || '').split('/').pop().split('?')[0]; }
+        window.nvShowQuizWarning = function (text) {
+            var box = document.getElementById('quiz-warning');
+            if (!box) return;
+            box.textContent = '';
+            box.appendChild(document.createTextNode(text + ' '));
+            var a = document.createElement('a');
+            a.href = 'check.html';
+            a.textContent = 'Run the file check';
+            a.style.fontWeight = '700';
+            box.appendChild(a);
+            box.style.display = 'block';
+        };
+        window.addEventListener('error', function (e) {
+            var t = e.target;
+            if (t && t.tagName === 'SCRIPT' && t.src) problems.push(name(t.src) + ' could not be loaded');
+            else if (e.message && problems.length < 3) problems.push(name(e.filename) + ': ' + e.message);
+            else return;
+            window.nvShowQuizWarning('Part of the site did not load properly (' + problems.join('; ') + '). The quiz still works, but some features may be missing. Reload the page, or upload the file again.');
+        }, true);
+    })();
+    </script>
     <div id="redo-banner" class="nv-redo-banner" style="display: none;"></div>
+    <div id="quiz-progress" class="nv-progress" style="display: none;"></div>
     <div class="question-container">
     <h2 id="question"></h2>
 </div>
 
 <div id="buttons">
     </div>
-    <script src="data.js"></script>
-    <script src="criteria.js"></script>
-    <script src="questions_tree.js"></script>
-    <script src="quiz.js"></script>
+    <script src="data.js?v=1790fb93"></script>
+    <script src="mods.js?v=1790fb93"></script>
+    <script src="criteria.js?v=1790fb93"></script>
+    <script src="questions_tree.js?v=1790fb93"></script>
+    <script src="quiz.js?v=1790fb93"></script>
     </div>
 </body>
 </html>
