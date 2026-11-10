@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoNeoValues - Ideology Builder</title>
+    <link rel="stylesheet" href="style.css?v=1790fb93">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <script src="theme.js?v=1790fb93"></script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#18181b">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <script src="pwa.js?v=1790fb93"></script>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Ideology Builder</h1>
+        <p class="intro-text nv-bld-intro">Pick a value in each category to see which ideology they make, the closest alternatives, and the exact quiz answers that give you those values.</p>
+
+        <div class="nv-bld-tools">
+            <button id="bld-mine" type="button" style="display: none;">Start from my results</button>
+            <button id="bld-random" type="button">Random</button>
+            <button id="bld-clear" type="button">Clear</button>
+        </div>
+
+        <div id="bld-grid" class="nv-bld-grid"></div>
+        <div id="bld-result" class="nv-bld-result"></div>
+        <div id="bld-howto" class="nv-bld-howto"></div>
+
+        <div id="buttons" style="margin-top: 20px; padding-bottom: 60px;">
+            <button id="bld-share" type="button" style="display: none;">Copy link to this build</button>
+            <button id="bld-open" type="button" style="display: none;">Open as a results page</button>
+            <button onclick="location.href='index.html'">Back to menu</button>
+        </div>
+    </div>
+
+    <script src="data.js?v=1790fb93"></script>
+    <script src="mods.js?v=1790fb93"></script>
+    <script src="criteria.js?v=1790fb93"></script>
+    <script src="share.js?v=1790fb93"></script>
+    <script src="questions_tree.js?v=1790fb93"></script>
+    <script>
+        const picks = {};                              // {category: valueId}
+        const cards = {};                              // {category: {img, name, select}}
+        const grid = document.getElementById('bld-grid');
+        const resultBox = document.getElementById('bld-result');
+        const howtoBox = document.getElementById('bld-howto');
+        const compact = () => encodeURIComponent(nvEncodeResults(picks)).replace(/%2C/g, ',');
+        const onSite = location.protocol === 'http:' || location.protocol === 'https:';
+
+        // start: a shared build (?s=), else the visitor's own results, else empty
+        Object.assign(picks, nvGetUserResults());
+
+        // ----- one card per category -----
+        categories.forEach(cat => {
+            const card = document.createElement('div');
+            card.className = 'nv-bld-card';
+
+            const title = document.createElement('div');
+            title.className = 'nv-bld-cat';
+            title.textContent = categoryTitles[cat] || cat;
+
+            const preview = document.createElement('div');
+            preview.className = 'nv-bld-preview';
+            const img = document.createElement('img');
+            img.alt = '';
+            img.onerror = () => { img.style.visibility = 'hidden'; };
+            const name = document.createElement('span');
+            preview.appendChild(img);
+            preview.appendChild(name);
+
+            const select = document.createElement('select');
+            select.className = 'nv-input';
+            select.setAttribute('aria-label', categoryTitles[cat] || cat);
+            const none = document.createElement('option');
+            none.value = ''; none.textContent = '\u2014 choose \u2014';
+            select.appendChild(none);
+            Object.keys(resultsMapping[cat]).forEach(id => {
+                const o = document.createElement('option');
+                o.value = id; o.textContent = resultsMapping[cat][id];
+                select.appendChild(o);
+            });
+            select.addEventListener('change', () => {
+                if (select.value) picks[cat] = select.value; else delete picks[cat];
+                update();
+            });
+
+            card.appendChild(title);
+            card.appendChild(preview);
+            card.appendChild(select);
+            grid.appendChild(card);
+            cards[cat] = { img, name, select, preview };
+        });
+
+        function renderCards() {
+            categories.forEach(cat => {
+                const c = cards[cat], id = picks[cat];
+                c.select.value = id || '';
+                if (id) {
+                    c.img.style.visibility = 'visible';
+                    c.img.src = `icons/${cat}/${id}.svg`;
+                    c.name.textContent = resultsMapping[cat][id];
+                    c.preview.classList.remove('nv-empty');
+                } else {
+                    c.img.removeAttribute('src');
+                    c.img.style.visibility = 'hidden';
+                    c.name.textContent = 'Not chosen';
+                    c.preview.classList.add('nv-empty');
+                }
+            });
+        }
+
+        function renderResult() {
+            resultBox.textContent = '';
+            const chosen = categories.filter(c => picks[c]);
+            if (!chosen.length) {
+                const p = document.createElement('p');
+                p.className = 'nv-criteria-hint';
+                p.style.textAlign = 'center';
+                p.textContent = 'Pick values above to see which ideology they make.';
+                resultBox.appendChild(p);
+                return null;
+            }
+            const match = nvMatchIdeology(picks);
+
+            const label = document.createElement('div');
+            label.className = 'nv-bld-cat';
+            label.textContent = 'Your build';
+            resultBox.appendChild(label);
+
+            const pill = document.createElement(match ? 'a' : 'div');
+            pill.className = 'nv-pill nv-pill-lg';
+            pill.textContent = match ? match.name : 'No exact match';
+            pill.style.backgroundColor = match ? (labelColors[match.name] || '#7a7a7a') : '#7a7a7a';
+            if (match) pill.href = `description.html?id=${encodeURIComponent(match.name)}&type=ideology`;
+            resultBox.appendChild(pill);
+
+            const note = document.createElement('p');
+            note.className = 'nv-criteria-hint';
+            note.style.marginTop = '10px';
+            note.textContent = chosen.length < categories.length
+                ? `${chosen.length} of ${categories.length} categories chosen. Choose all ${categories.length} to see what the quiz would give you.`
+                : 'All 9 categories chosen: this is exactly what the quiz would give you.';
+            resultBox.appendChild(note);
+
+            if (match && descriptions[match.name]) {
+                const d = document.createElement('p');
+                d.className = 'nv-bld-desc';
+                const text = descriptions[match.name];
+                d.textContent = text.length > 240 ? text.slice(0, 237).trimEnd() + '\u2026' : text;
+                resultBox.appendChild(d);
+            }
+
+            const closest = nvClosestIdeologies(picks, 5, match ? [match.name] : []);
+            if (closest.length) {
+                const h = document.createElement('div');
+                h.className = 'nv-bld-cat';
+                h.style.marginTop = '18px';
+                h.textContent = match ? 'Also close' : 'Closest matches';
+                resultBox.appendChild(h);
+                closest.forEach((c, i) => {
+                    const pct = Math.round(c.score * 100);
+                    resultBox.appendChild(nvMakeRankRow({
+                        rank: i + 1, name: c.name, pct,
+                        meta: `${pct}% \u00B7 ${c.exact} of ${c.total} criteria` + (c.close ? ` (+${c.close} close)` : ''),
+                        href: `description.html?id=${encodeURIComponent(c.name)}&type=ideology`
+                    }));
+                });
+            }
+            return match;
+        }
+
+        function renderHowto() {
+            howtoBox.textContent = '';
+            const chosen = categories.filter(c => picks[c]);
+            if (!chosen.length || !window.NV_QUESTIONS_TREE) return;   // no question data = nothing useful to show
+            const h = document.createElement('h2');
+            h.className = 'nv-criteria-title';
+            h.textContent = 'How to get these values';
+            const p = document.createElement('p');
+            p.className = 'nv-criteria-hint';
+            p.textContent = 'Each category is separate. Answer its questions like this in the quiz. Click a value to expand.';
+            howtoBox.appendChild(h);
+            howtoBox.appendChild(p);
+            chosen.forEach(cat => {
+                const det = document.createElement('details');
+                det.className = 'nv-path';
+                const sum = document.createElement('summary');
+                const chip = nvMakeChip(picks[cat]);
+                if (chip) sum.appendChild(chip);
+                det.appendChild(sum);
+                det.appendChild(nvMakePathBlock(picks[cat]));
+                howtoBox.appendChild(det);
+            });
+        }
+
+        function update() {
+            renderCards();
+            renderResult();
+            renderHowto();
+            const n = categories.filter(c => picks[c]).length;
+            document.getElementById('bld-share').style.display = (onSite && n) ? '' : 'none';
+            document.getElementById('bld-open').style.display = n ? '' : 'none';
+            try {
+                history.replaceState(null, '', location.pathname + (n ? '?s=' + compact() : ''));
+            } catch (e) { /* not allowed for files opened from disk; harmless */ }
+        }
+
+        // ----- buttons -----
+        let saved = {};
+        try { saved = nvSanitizeResults(JSON.parse(localStorage.getItem('quizResults') || '{}')); } catch (e) {}
+        const mineBtn = document.getElementById('bld-mine');
+        if (nvHasResults(saved)) {
+            mineBtn.style.display = '';
+            mineBtn.onclick = () => { Object.keys(picks).forEach(k => delete picks[k]); Object.assign(picks, saved); update(); };
+        }
+        document.getElementById('bld-random').onclick = () => {
+            categories.forEach(cat => {
+                const ids = Object.keys(resultsMapping[cat]);
+                picks[cat] = ids[Math.floor(Math.random() * ids.length)];
+            });
+            update();
+        };
+        document.getElementById('bld-clear').onclick = () => { Object.keys(picks).forEach(k => delete picks[k]); update(); };
+        document.getElementById('bld-share').onclick = () => nvShowShareLink(nvBuildShareUrl(picks), {
+            title: 'Share this build',
+            note: 'Anyone with this link sees this build. Nothing is saved on a server.',
+            shareTitle: 'My NeoNeoValues ideology build'
+        });
+        document.getElementById('bld-open').onclick = () => { location.href = 'results.html?s=' + compact(); };
+
+        update();
+    </script>
+</body>
+</html>

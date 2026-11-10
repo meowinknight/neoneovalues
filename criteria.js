@@ -142,13 +142,42 @@ function nvIdeologiesForValue(valueId) {
    Shared logic for: results ranking, "how to get this", compare view
    ====================================================================== */
 
-/* The user's quiz results: from the ?r= URL param first, then localStorage. */
+/* ---------- results in URLs: validation + a compact share format ---------- */
+
+/* Keep only known categories and known value ids (results can arrive from a URL, so never trust them). */
+function nvSanitizeResults(obj) {
+    const clean = {};
+    if (!obj || typeof obj !== 'object') return clean;
+    categories.forEach(cat => {
+        const v = obj[cat];
+        if (typeof v === 'string' && resultsMapping[cat] && Object.prototype.hasOwnProperty.call(resultsMapping[cat], v)) {
+            clean[cat] = v;
+        }
+    });
+    return clean;
+}
+
+/* Compact form used for share links: the nine value ids in quiz order, comma separated. */
+function nvEncodeResults(res) {
+    return categories.map(cat => (res && res[cat]) || '').join(',');
+}
+
+function nvDecodeResults(str) {
+    const obj = {};
+    String(str || '').split(',').forEach((v, i) => { if (categories[i] && v) obj[categories[i]] = v; });
+    return nvSanitizeResults(obj);
+}
+
+/* The user's quiz results: ?s= (shared link), then ?r= (internal links), then localStorage. */
 function nvGetUserResults() {
     try {
-        const r = new URLSearchParams(window.location.search).get('r');
-        if (r) return JSON.parse(r) || {};
+        const params = new URLSearchParams(window.location.search);
+        const s = params.get('s');
+        if (s) return nvDecodeResults(s);
+        const r = params.get('r');
+        if (r) return nvSanitizeResults(JSON.parse(r));
     } catch (e) {}
-    try { return JSON.parse(localStorage.getItem('quizResults') || '{}') || {}; } catch (e) { return {}; }
+    try { return nvSanitizeResults(JSON.parse(localStorage.getItem('quizResults') || '{}')); } catch (e) { return {}; }
 }
 
 function nvHasResults(res) { return !!res && Object.keys(res).length > 0; }
@@ -306,4 +335,104 @@ function nvCompareSides(specA, specB, userRes) {
         if (!best || cand.shared > best.shared || (cand.shared === best.shared && cand.differ < best.differ)) best = cand;
     }));
     return best;
+}
+
+
+/* ======================================================================
+   Ideology builder + "similar ideologies"
+   ====================================================================== */
+
+/* The ideology a set of values produces. Same rule as the quiz results: the most specific ideology
+   whose values are ALL included wins. `res` is {category: valueId}. Returns {name, key} or null. */
+function nvMatchIdeology(res) {
+    const values = Object.values(res || {});
+    const key = Object.keys(labelMapping)
+        .sort((a, b) => b.split('|').length - a.split('|').length)
+        .find(k => k.split('|').every(part => values.includes(part)));
+    return key ? { name: labelMapping[key], key } : null;
+}
+
+/* How alike are two ideologies (given as {category: valueId} maps)?
+   Per category either of them defines: same value = 1, same family = 0.5, otherwise 0.
+   conflicts counts categories whose families are incompatible. */
+function nvIdeologyPairScore(mapA, mapB) {
+    let sum = 0, universe = 0, exact = 0, close = 0, conflicts = 0;
+    categories.forEach(cat => {
+        const x = mapA[cat], y = mapB[cat];
+        if (!x && !y) return;
+        universe++;
+        if (!x || !y) return;
+        if (x === y) { sum += 1; exact++; return; }
+        const gx = nvGroupOf(cat, x), gy = nvGroupOf(cat, y);
+        if (gx && gx === gy) { sum += 0.5; close++; return; }
+        if (gx && gy) {
+            const a = incompatibleSubCategories[gx] || [], b = incompatibleSubCategories[gy] || [];
+            if (a.includes(gy) || b.includes(gx)) conflicts++;
+        }
+    });
+    return { score: universe ? sum / universe : 0, exact, close, conflicts, universe };
+}
+
+/* The n ideologies most like `name` (best variant of each), skipping ones that clash with it. */
+function nvSimilarIdeologies(name, n) {
+    const mine = nvVariantMaps(name);
+    return nvAllIdeologies()
+        .filter(other => other !== name)
+        .map(other => {
+            let best = null;
+            nvVariantMaps(other).forEach(mb => mine.forEach(ma => {
+                const s = nvIdeologyPairScore(ma, mb);
+                if (!best || s.score > best.score || (s.score === best.score && s.conflicts < best.conflicts)) best = s;
+            }));
+            return best ? Object.assign({ name: other }, best) : null;
+        })
+        .filter(s => s && s.conflicts === 0 && s.exact > 0)
+        .sort((a, b) => b.score - a.score || b.exact - a.exact || a.name.localeCompare(b.name))
+        .slice(0, n);
+}
+
+/* One ranked row: rank, ideology pill, bar, detail text and an optional Compare link.
+   o = { rank, name, pct, meta, href, compareHref } */
+function nvMakeRankRow(o) {
+    const row = document.createElement('div');
+    row.className = 'nv-closest-row';
+
+    const rank = document.createElement('span');
+    rank.className = 'nv-rank';
+    rank.textContent = o.rank;
+
+    const main = document.createElement('div');
+    main.className = 'nv-closest-main';
+
+    const link = document.createElement('a');
+    link.className = 'nv-pill';
+    link.href = o.href;
+    link.textContent = o.name;
+    link.style.backgroundColor = labelColors[o.name] || '#7a7a7a';
+
+    const bar = document.createElement('div');
+    bar.className = 'nv-bar';
+    const fill = document.createElement('div');
+    fill.className = 'nv-bar-fill';
+    fill.style.width = o.pct + '%';
+    bar.appendChild(fill);
+
+    const meta = document.createElement('div');
+    meta.className = 'nv-closest-meta';
+    meta.textContent = o.meta;
+
+    main.appendChild(link);
+    main.appendChild(bar);
+    main.appendChild(meta);
+    row.appendChild(rank);
+    row.appendChild(main);
+
+    if (o.compareHref) {
+        const cmp = document.createElement('a');
+        cmp.className = 'nv-change';
+        cmp.href = o.compareHref;
+        cmp.textContent = 'Compare';
+        row.appendChild(cmp);
+    }
+    return row;
 }

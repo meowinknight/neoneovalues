@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoNeoValues - File check</title>
+    <style>
+        /* self-contained on purpose: this page must work even when other site files are missing */
+        :root { color-scheme: dark light; --bg:#18181b; --card:#27272a; --text:#f4f4f5; --dim:#a1a1aa; --good:#4ade80; --bad:#f87171; --line:rgba(255,255,255,.12); }
+        @media (prefers-color-scheme: light) { :root { --bg:#f4f4f6; --card:#ffffff; --text:#18181b; --dim:#52525b; --good:#15803d; --bad:#b91c1c; --line:rgba(0,0,0,.12); } }
+        body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif; }
+        main { max-width:760px; margin:0 auto; padding:28px 18px 60px; }
+        h1 { font-size:1.8rem; margin:0 0 6px; }
+        p { color:var(--dim); margin:0 0 16px; }
+        .box { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin:12px 0; }
+        .ok { color:var(--good); } .bad { color:var(--bad); }
+        .row { padding:8px 0; border-top:1px solid var(--line); }
+        .row:first-child { border-top:0; }
+        .row b { word-break:break-all; }
+        .row small { display:block; color:var(--dim); }
+        details summary { cursor:pointer; color:var(--dim); }
+        .bar { height:8px; border-radius:8px; background:var(--line); overflow:hidden; margin:10px 0 4px; }
+        .bar i { display:block; height:100%; width:0; background:var(--good); transition:width .2s; }
+        button, a.btn { font:inherit; font-weight:700; padding:12px 18px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); cursor:pointer; text-decoration:none; display:inline-block; margin:6px 8px 0 0; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>File check</h1>
+    <p>Checks that every file of this site arrived complete and is the version it should be. If something is flagged, upload that file again from the latest zip, then reload.</p>
+
+    <div class="box" id="summary">Starting&hellip;</div>
+    <div class="bar"><i id="progress"></i></div>
+    <div id="problems"></div>
+    <details id="allfiles" style="display:none"><summary>Show all files that are fine</summary><div class="box" id="okfiles"></div></details>
+
+    <button id="again" type="button">Check again</button>
+    <a class="btn" href="index.html">Back to menu</a>
+</main>
+
+<script>
+// EXPECTED-BEGIN
+const EXPECTED = {"index.html":[2809,"436117d4fe410b53d5fecbff1cce6fa390dc8b9d"],"Instruction.html":[983,"564b92375b158bf969b79601badd1913dc1654d1"],"quiz.html":[2549,"068f0495a0559b6cd87d697d4527e081e72e8fc4"],"results.html":[14884,"ce9355a98ddd699c02b97db5ee504c71b0506fbd"],"ideologies.html":[7637,"65290e005bd457cdfd0172c441716412248f6d97"],"values.html":[5149,"d51c229e5a3b5c985395c25eaab56b8d00e48507"],"description.html":[10354,"775ebd804edb1d58dbb4a7fa2e3521aed52f7710"],"compare.html":[8505,"9786b4b5c43a5b8e9263e640d5fa4a05ab1233f4"],"builder.html":[11078,"9267385ee5a9e0e0672e73b5edb45e571433a630"],"style.css":[27700,"d7a0559be85534ca77daa6b6d4f1053bf376014b"],"theme.js":[5819,"1ffde043e8e46b6b9042edf9b2372eb50ff81a96"],"pwa.js":[1864,"0ad21244d5acdf5173ec34c860f0ff9744725f88"],"data.js":[133467,"789f087e337245c0c90f71bc835cf643517b478a"],"mods.js":[12928,"fb294609ade8973d3eb15aaa400ca8691927389b"],"criteria.js":[17719,"9131088635e36b8cc6aa35cf79e2580bcc9b4a96"],"questions_tree.js":[32649,"954a2c17d2a2d7df409b5d8ceff373140d5f76b4"],"quiz.js":[9102,"166bd89fb45414a955a172d0ea1466a269773d5c"],"export.js":[13662,"128878c82e3d263a1e0204585d56782350d0b9e3"],"share.js":[3557,"876219997be2744edd35fc51cbded03a84fcaf47"],"icons_data.js":[1980323,"1fac1902694be870c1ecd424270d2154e9d134e8"],"manifest.webmanifest":[705,"ae4b14bf20efe25dd8a5b536ba05b3fa9dbb484b"],"icon.svg":[928,"537f9ad2c53f1e07ed084cfc2bbf5ed154f7a71a"],"icon-192.png":[12350,"86cbff66e8f23f99ace14d1eb5e7c0b5f85c9ad2"],"icon-512.png":[39023,"4edf94851d6d4c7240541656027a14994477ed88"],"icon-maskable-512.png":[27043,"a1b93258e5752290028147300b92af50da025906"],"apple-touch-icon.png":[8500,"5d396e529a2ee9967ef42cb0e14e061917c5202d"],"icons/authority/absolute.svg":[16779,"25dab5dff2262406342481b116103680d0b6387a"],"icons/authority/anarchism.svg":[10143,"a1481b0068084f05774ff013806551dbe13d19a1"],"icons/authority/anarcho_monarchism.svg":[24750,"72094fe2d6ad0c086c6702c2c910d6d22597cb5a"],"icons/authority/aristocracy.svg":[14130,"8f20de532c91d4c367161bb79b6d1b8b3b0e63f4"],"icons/authority/autocracy.svg":[40295,"37c44c88e4037d67054d6439eb4469ac8be7b478"],"icons/authority/constitutional.svg":[12163,"369f62b8559e56ed1161c8133a361a2928207f52"],"icons/authority/direct_democracy.svg":[11306,"114b1b4f80e00bcdd375661ca5a68da720be737d"],"icons/authority/meritocracy.svg":[13003,"7e593705c40739f85f1fa8f0ed84e9fb5afaf256"],"icons/authority/minarchism.svg":[142633,"a97b988c5473e038295e66d845824365f0c0a78f"],"icons/authority/neocameralism.svg":[9704,"e4d13a78f006fba5a88b4f8ec110cd869f9d464b"],"icons/authority/partocracy.svg":[29302,"233d5f04be73d8abce59f3310f92532bc81a8b65"],"icons/authority/religious_authoritarianism.svg":[15122,"f1f6108fd77a7eac162c884614d111e1d1629c64"],"icons/authority/representative_democracy.svg":[16613,"d168d3e231fe166e404caf48d29088ce01a4d1cf"],"icons/authority/stratocracy.svg":[87979,"5f3a3490cdcf176271a9a56bac03aeb6c65a4ce5"],"icons/authority/technocracy.svg":[7608,"ff935658ee1117d763e7d81545ffd8b004e38ae3"],"icons/authority/theocracy.svg":[8872,"a9fb12ccc209c08c8908c9ac8def40fd0511bbd0"],"icons/authority/totalitarianism.svg":[20764,"cf0e6db03eb469d7040bac9f324d7a3205844b06"],"icons/culture/alternative_modernism.svg":[108901,"377e99275e9f1858436e9cd551f7568d55c93494"],"icons/culture/civil_liberalism.svg":[16781,"6a35275b571ec6e58f7f8d05b98e85f33a46301e"],"icons/culture/conservatism.svg":[6084,"1d1260d396031cbec4ebb1aea0669b20080320eb"],"icons/culture/conservative_liberalism.svg":[2947,"3e8b5063a748062d9abf3fe06b121180c9d5656f"],"icons/culture/liberal_conservatism.svg":[4483,"fece4e9826b7716680cb91bb60209339dab2f51c"],"icons/culture/neoreactionaryism.svg":[15264,"251995746068aed89737641a52157901a8148ecb"],"icons/culture/paleoconservatism.svg":[8567,"2d26e6ca923e9c86c8960fee52f1d140933bf579"],"icons/culture/perennial_traditionalism.svg":[5679,"4db3df0bad362912e7e44855e2eb8dd742b8aa22"],"icons/culture/postmodernism.svg":[3551,"ef16ae5ef17dc1df19fb2c4f5a0d1bdba07898e2"],"icons/culture/progressive_conservatism.svg":[2274,"4d18e7823ffebd2e9d7ec3f52bb44e035284d95c"],"icons/culture/progressivism.svg":[7865,"fb12d0c881f33eb9623b141dee273863d6c5aac6"],"icons/culture/reactionary_modernism.svg":[15329,"0203fbdf556cd225440d173a54b345382a594658"],"icons/culture/reactionaryism.svg":[5255,"c79e7889b650578b9b1faeb262edccf6b5aa7c88"],"icons/culture/religious_traditionalism.svg":[10141,"28ea8899dac44aa94844fb2070ba01bcc0522f57"],"icons/culture/social_progressivism.svg":[7030,"9724f599d0e48f3a854e1158af7d60d8c4d87384"],"icons/culture/traditionalist_conservatism.svg":[7991,"2542becb128e1afdba0c57ff6b0d033f9d4866af"],"icons/economics/agrarian_socialism.svg":[91113,"f422b7bb9c34531e95bb050bca0be89490a6f68c"],"icons/economics/cameralism.svg":[10224,"cfb4fa37ae02edf0792838df4aa1cd5e7d945329"],"icons/economics/communization.svg":[110533,"68949b55143604193dfc4b1c9d1dde0af10c5843"],"icons/economics/corporatism.svg":[5749,"e60127ca6de47e86f165bbfddb60fc07f0c74d5a"],"icons/economics/countereconomics.svg":[7855,"707103770ff2200f06387c630e8d2277a1dc821e"],"icons/economics/dirigisme.svg":[5244,"b43878a48d8fdae28385096834cce58bbf65b086"],"icons/economics/distributism.svg":[22122,"22f9e9087000cd4984366e3234605c05996fd8c5"],"icons/economics/feudalism.svg":[13757,"6f781fc7f971710e4fc4e67353529e4e1e82c5f5"],"icons/economics/free_market_distributism.svg":[21895,"cbefdde73c09b386592f97f4a9d61cce77c8ac7c"],"icons/economics/free_socialism.svg":[4405,"d47c5932c907507fadc630c068003c507febb42e"],"icons/economics/guild_socialism.svg":[10449,"484bebde495f644b122f2e6dd48b025ca5cbcfd8"],"icons/economics/keynesianism.svg":[9148,"7fcc524f853debe89f932a24e49c616e0e70e40c"],"icons/economics/laissez_faire.svg":[3486,"95b4e626e338405d7af57ece62c7617a24c15cb9"],"icons/economics/market_socialism.svg":[5818,"6774e7a9648dda9f9a40e5ae10e88676079560af"],"icons/economics/mutual_distributism.svg":[22129,"757846d6b8b75fe40f47e38bf0a7b428e2f70850"],"icons/economics/mutualism.svg":[7748,"5dee597854192d59022857047dc6b60c7f5f2c44"],"icons/economics/neo_corporatism.svg":[5906,"1d4af8b4db68b187d640d62ef522e7d69d735ac8"],"icons/economics/social_capitalism.svg":[5415,"2202073c3f80057897702c18553ea989543d7157"],"icons/economics/social_corporatism.svg":[5771,"01dd5ec9aaa54662ae7e56b5a0b6009d6b604ea7"],"icons/economics/social_distributism.svg":[22129,"7c7208307d71aeb97954b55ccb30f5529e7006cd"],"icons/economics/socialism.svg":[4686,"fcf0c11a8cab4efd4b884c21ef935e1b01c026bd"],"icons/economics/state_capitalism.svg":[5112,"6d009c1d839791932a44edbf6f233a754073a592"],"icons/economics/state_socialism.svg":[2381,"8b1f4c0f69db930858da9aff0a95bf6dc0ea5aa3"],"icons/economics/syndicalism.svg":[29211,"ec6257ae7ae33232cdc3c2375a2fed616969a9f8"],"icons/economics/third_way.svg":[12317,"5c1aaa4c8f3583bbf6f196d885368a8a7ae08aa5"],"icons/economics/utopian_socialism.svg":[21466,"b670c296d61e5a85c0372c45fbe3cb84de841a2b"],"icons/economics/welfare_capitalism.svg":[4395,"00cf4ca0c255fb506ac1000c222797150de6c150"],"icons/economics/yellow_socialism.svg":[22887,"83cec6b8215aaeb6635a92f3952fcbaa4c9e8e08"],"icons/foreign/Globalism.svg":[127177,"9c67e0052077445b3993cf427fa5286c723f5699"],"icons/foreign/Imperialism.svg":[8918,"6d8ec484eaf3067dfb42ac33cd3241a9acb1827e"],"icons/foreign/Internationalism.svg":[7961,"6c1e2f6e3bcf09e946c443bc0fab024a3f4eba00"],"icons/foreign/Interventionism.svg":[11763,"8545c6602f5695a08a24280d3d16ca7fbcfd8d92"],"icons/foreign/Isolationism.svg":[58318,"1a66178dc56c62d44ea23efd6f003a3d52a838f6"],"icons/foreign/Non_Interventionism.svg":[5989,"83be8bb08670bd56170980c5d7a827a88e7d5a65"],"icons/foreign/Realpolitik.svg":[3608,"7af211d5456069d7b55b7f267a4892635c6896ab"],"icons/foreign/alter_globalism.svg":[19623,"dce26162879c73972632f7b6710218ac66f60bf6"],"icons/foreign/armed_neutrality.svg":[2252,"4fd253f9807c4155933b259586bf4612565f9e87"],"icons/nation/Cosmopolitanism.svg":[10922,"d859cf108be210748a9f2ee7a29bceb8b89d0cf5"],"icons/nation/Tribalism.svg":[4601,"e262d1a5375b3657dd565030d225afae59494be8"],"icons/nation/civic_nationalism.svg":[3827,"d3f66a6aa9623ad4dd53f1774ddccd38d5e402ba"],"icons/nation/civilizationism.svg":[5825,"3c7aecb1f89e5358a931f038b3faa665cd1c3e9a"],"icons/nation/communitarianism.svg":[15015,"b0c355f492cea103def0861cd028cbfd82de92d3"],"icons/nation/cultural_nationalism.svg":[3830,"d30a6826b5c97b04cb0545c5451788f44d187bed"],"icons/nation/egoism.svg":[2256,"e43a6551cd13a0139a4fbdd88d7cebb8185f6751"],"icons/nation/ethnic_nationalism.svg":[3828,"7b2445a0822cc1ce78f262047992e9c824e4a39c"],"icons/nation/pan_nationalism.svg":[21060,"b2181a79be2846e84aec3012a23ef67c14ef8f47"],"icons/nation/racial_nationalism.svg":[3828,"eaeb7a762808f7048a5c51439af3127d0dd3983f"],"icons/nation/religious_nationalism.svg":[3592,"13f52fbed4748f0ee12add2f0104b4e38e120b8c"],"icons/nation/romantic_nationalism.svg":[3591,"61da87608ddceaff07200d4aefa990efe771d48f"],"icons/resource_management/Confiscatory_Taxation.svg":[4251,"3d43dbe0197d9748a15ea69e7c8fa52939f9c7b8"],"icons/resource_management/Progressive_Taxation.svg":[4272,"85fef2547dce1dbb94a77e2b848edf681b0aef16"],"icons/resource_management/Voluntaryism.svg":[2789,"05ceec57d39c83bec60d461d03cd0a020df65283"],"icons/resource_management/collective_distribution.svg":[4686,"fcf0c11a8cab4efd4b884c21ef935e1b01c026bd"],"icons/resource_management/flat_taxation.svg":[3925,"f913b73e6237c35e1a514e318e6967cd77098104"],"icons/resource_management/lvt.svg":[4413,"08497b879942ab357efeca6548eb51221444da60"],"icons/social_control/civic_paternalism.svg":[10889,"f72ec98bcf622cf10e303130bfc47a8078bc45c6"],"icons/social_control/civil_libertarianism.svg":[38160,"724e004cb449a8893293b4277ea70f497bec6b9e"],"icons/social_control/disciplinarianism.svg":[5292,"1e4ce1cdc51615db8d41fe5d57e25c3f961cd45e"],"icons/social_control/legal_moralism.svg":[22253,"f9aea7956df31d1c4d5c3c8d9161c14dca37515c"],"icons/social_control/permissivism.svg":[3446,"e1e7040374790397d62bd329c9cc4f10c66d4224"],"icons/social_control/regimentalism.svg":[6541,"87a00e270137fb9be6fa6642d7ea99fa317cb912"],"icons/social_control/securitism.svg":[5285,"d0396136a3e1e9501729ca1a9daa9fd0651c2eef"],"icons/social_control/totalism.svg":[3373,"20b4e49e1d3583a85854710e4815443914e801d5"],"icons/technology/conservationism.svg":[3218,"4d89d6f7118a4eb966d2ad02f06c1a2e21fed2fd"],"icons/technology/ecomodernism.svg":[8334,"810388d3c38f7133d3dc16c8999a780dc16d63e2"],"icons/technology/environmentalism.svg":[4939,"71e14e1c70db2a9a4c24873bbb98a3ef93d5c357"],"icons/technology/extropianism.svg":[6074,"707bce7eec2dd140de2412d7a6ee6319185cd197"],"icons/technology/industrialism.svg":[5074,"367ac358012b2261d370401e23d328e4ee6ef8cc"],"icons/technology/instrumentalism.svg":[11643,"8a7bbf3ecd923887f385bbba1c222c31926312f0"],"icons/technology/neoluddism.svg":[33943,"e1bca4ab26fbbca2c08a607f1b1b15553ef6c66f"],"icons/technology/posthumanism.svg":[13273,"37ab83c0316c9ec9634db74548c068b7eae5b3d6"],"icons/technology/primitivism.svg":[8595,"744a58dd93b3d74c967ffe5378e4c3daaf939b7f"],"icons/technology/prometheanism.svg":[8221,"1d03303ff0b02127390c164a7aa007e6204c2e17"],"icons/technology/techno_fatalism.svg":[77536,"cfc45e9b8cb2225dfa07e773c2430b75cfad8902"],"icons/technology/technocapitalism.svg":[77894,"3631c7dd32f45666fe05ef82b5d7b330c7161b17"],"icons/technology/transhumanism.svg":[5949,"915361f94e69e9ecbebbf853387aac416a3fdadc"],"icons/territorial_organization/centralism.svg":[3282,"41f048c7390b4bf055734ad300db9240e36b03c9"],"icons/territorial_organization/confederalism.svg":[13428,"c64c40f594ca80e75de752dbd7d9378e74b1a48a"],"icons/territorial_organization/federalism.svg":[10729,"60ef8ca8c6a2832e4af00a46f752b088d0d02827"],"icons/territorial_organization/hypercentralism.svg":[12600,"dcba3cf35437f4634b41886a3c36bd6d34ece7e9"],"icons/territorial_organization/municipalism.svg":[5695,"76156adab8da04c3f219c635d3835a687fbfcf98"],"icons/territorial_organization/regionalism.svg":[7073,"dbc161e909d4a2b8b10dd3120973196392018813"],"sw.js":[8258,"965ccdf9db8250ca486d94f10ebfe9c4635168f2"]};
+// EXPECTED-END
+
+const $ = id => document.getElementById(id);
+
+async function sha1Hex(buf) {
+    if (!(window.crypto && crypto.subtle)) return null;
+    try {
+        const d = await crypto.subtle.digest('SHA-1', buf);
+        return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) { return null; }
+}
+
+async function checkOne(path) {
+    const want = EXPECTED[path];
+    try {
+        // a changing ?nvcheck= value makes sure we see what the server really has, not a saved copy
+        const res = await fetch(path + '?nvcheck=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return { path, state: 'missing', note: 'not found on the server (HTTP ' + res.status + ')' };
+        const buf = await res.arrayBuffer();
+        if (buf.byteLength !== want[0]) {
+            const short = buf.byteLength < want[0];
+            return { path, state: 'different', note: buf.byteLength + ' bytes found, ' + want[0] + ' expected \u2014 ' +
+                (short ? 'cut off or an older version' : 'a newer or edited version') };
+        }
+        const h = await sha1Hex(buf);
+        if (h && h !== want[1]) return { path, state: 'different', note: 'right size but different content \u2014 edited, or another version' };
+        return { path, state: 'ok' };
+    } catch (e) {
+        return { path, state: 'error', note: 'could not be read (' + (e && e.message ? e.message : e) + ')' };
+    }
+}
+
+async function run() {
+    $('problems').innerHTML = ''; $('okfiles').innerHTML = ''; $('allfiles').style.display = 'none'; $('progress').style.width = '0';
+    if (location.protocol === 'file:') {
+        $('summary').textContent = 'This page can only check a site that is being served (a website, or a local server such as the one in your editor). Files opened straight from disk cannot be checked.';
+        return;
+    }
+    const paths = Object.keys(EXPECTED);
+    if (!paths.length) { $('summary').textContent = 'This copy of the page has no file list. Run python3 tools/build.py and upload check.html again.'; return; }
+
+    let done = 0, bad = [];
+    const okList = [];
+    $('summary').textContent = 'Checking ' + paths.length + ' files\u2026';
+    const queue = paths.slice();
+    async function worker() {
+        while (queue.length) {
+            const r = await checkOne(queue.shift());
+            done++;
+            $('progress').style.width = Math.round(100 * done / paths.length) + '%';
+            if (r.state === 'ok') okList.push(r.path); else bad.push(r);
+            $('summary').textContent = 'Checked ' + done + ' of ' + paths.length + ' files\u2026';
+        }
+    }
+    await Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
+    $('progress').style.width = '100%';
+
+    if (!bad.length) {
+        $('summary').innerHTML = '<span class="ok"><b>\u2713 All ' + paths.length + ' files are complete and up to date.</b></span>' +
+            (window.crypto && crypto.subtle ? '' : '<br><small>(Sizes match; content could not be fingerprinted in this browser.)</small>');
+    } else {
+        bad.sort((a, b) => a.path.localeCompare(b.path));
+        $('summary').innerHTML = '<span class="bad"><b>\u2717 ' + bad.length + ' of ' + paths.length + ' files need attention.</b></span><br>' +
+            'Upload ' + (bad.length === 1 ? 'this file' : 'these files') + ' again from the latest zip, then reload the site.';
+        const box = document.createElement('div'); box.className = 'box';
+        bad.forEach(r => {
+            const row = document.createElement('div'); row.className = 'row';
+            const name = document.createElement('b'); name.textContent = r.path;
+            const note = document.createElement('small'); note.className = 'bad'; note.textContent = r.note;
+            row.appendChild(name); row.appendChild(note); box.appendChild(row);
+        });
+        $('problems').appendChild(box);
+    }
+    if (okList.length) {
+        okList.sort();
+        okList.forEach(p => { const d = document.createElement('div'); d.className = 'row'; d.textContent = '\u2713 ' + p; $('okfiles').appendChild(d); });
+        $('allfiles').style.display = 'block';
+    }
+}
+$('again').onclick = run;
+run();
+</script>
+</body>
+</html>

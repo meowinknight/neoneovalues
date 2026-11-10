@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeoNeoValues - Description</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/svg" href="icon.svg">
-    <script src="theme.js"></script>
+    <link rel="stylesheet" href="style.css?v=1790fb93">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <script src="theme.js?v=1790fb93"></script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#18181b">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <script src="pwa.js?v=1790fb93"></script>
 </head>
 <body>
     <div class="main-container">
@@ -34,17 +38,25 @@
             <div id="howto-box"></div>
         </div>
 
+        <div id="similar-section" class="nv-criteria-section" style="display: none;">
+            <h2 class="nv-criteria-title">Similar ideologies</h2>
+            <p class="nv-criteria-hint">Ideologies that share the most values with this one (values from the same family count half).</p>
+            <div id="similar-list"></div>
+        </div>
+
         <div class="button-container">
             <button id="compare-btn" style="display: none;">Compare</button>
+            <button id="builder-btn" style="display: none;">Open in the builder</button>
             <button id="icon-source-btn" style="display: none;" onclick="openIconSource()">Original Icon Source</button>
             <div id="original-work-sign" class="original-work-sign" style="display: none;">Source not provided</div>
             <button onclick="window.history.back()">Back</button>
         </div>
     </div>
 
-    <script src="data.js"></script>
-    <script src="criteria.js"></script>
-    <script src="questions_tree.js"></script>
+    <script src="data.js?v=1790fb93"></script>
+    <script src="mods.js?v=1790fb93"></script>
+    <script src="criteria.js?v=1790fb93"></script>
+    <script src="questions_tree.js?v=1790fb93"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const itemId = urlParams.get('id');
@@ -76,11 +88,8 @@
             const critHint = document.getElementById('criteria-hint');
             let userValues = null;
             if (urlParams.get('from') === 'results') {
-                try {
-                    const r = urlParams.get('r');
-                    userValues = Object.values(JSON.parse(r || localStorage.getItem('quizResults') || '{}'));
-                } catch (e) {}
-                if (userValues && userValues.length === 0) userValues = null;
+                userValues = Object.values(nvGetUserResults());
+                if (userValues.length === 0) userValues = null;
             }
             critBox.appendChild(nvMakeCriteriaBlock(itemId, userValues));
             critHint.textContent = userValues
@@ -110,6 +119,32 @@
                     ? `compare.html?a=you&b=${encodeURIComponent(itemId)}${rParam}`
                     : `compare.html?b=${encodeURIComponent(itemId)}`;
             };
+
+            // MOD: similar ideologies
+            const similar = nvSimilarIdeologies(itemId, 6);
+            if (similar.length) {
+                const simList = document.getElementById('similar-list');
+                similar.forEach((s, idx) => {
+                    const pct = Math.round(s.score * 100);
+                    simList.appendChild(nvMakeRankRow({
+                        rank: idx + 1, name: s.name, pct,
+                        meta: `${pct}% \u00B7 ${s.exact} shared of ${s.universe} categories` + (s.close ? ` (+${s.close} close)` : ''),
+                        href: `description.html?id=${encodeURIComponent(s.name)}&type=ideology`,
+                        compareHref: `compare.html?a=${encodeURIComponent(itemId)}&b=${encodeURIComponent(s.name)}`
+                    }));
+                });
+                document.getElementById('similar-section').style.display = 'block';
+            }
+
+            // MOD: open this ideology's values in the builder
+            const variantMaps = nvVariantMaps(itemId);
+            if (variantMaps.length) {
+                const bb = document.getElementById('builder-btn');
+                bb.style.display = 'block';
+                bb.onclick = () => {
+                    location.href = 'builder.html?s=' + encodeURIComponent(nvEncodeResults(variantMaps[0])).replace(/%2C/g, ',');
+                };
+            }
         } else {
             const prettyName = (resultsMapping[category] && resultsMapping[category][itemId])
                                 ? resultsMapping[category][itemId]

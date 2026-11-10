@@ -449,15 +449,6 @@ const ideologyGroups = {
         "Cyberpunk Corpostatism",
         "Fireman Statism",
         "Soylentism"
-    ],
-    "Easter Eggs": [
-        "Fully Automated Luxury Gay Space Communism",
-        "Anarcho-Cottagecore",
-        "Shirism",
-        "Starfleetism",
-        "Butlerianism",
-        "Heinleinian Stratocracy",
-        "Singularitarianism"
     ]
 };
 
@@ -762,24 +753,7 @@ const labelMapping = {
     "progressivism|totalitarianism|totalism|centralism": "Fireman Statism",
     // Soylent Green / Malthusian Survivalism
     "state_capitalism|instrumentalism|regimentalism|centralism": "Soylentism",
-    "dirigisme|instrumentalism|regimentalism|centralism": "Soylentism",
-
-    /* 99. Easter Eggs (mod) */
-    "communization|collective_distribution|postmodernism|anarchism|Cosmopolitanism|Internationalism|prometheanism|permissivism|municipalism": "Fully Automated Luxury Gay Space Communism",
-    "communization|collective_distribution|postmodernism|anarchism|Cosmopolitanism|Internationalism|extropianism|permissivism|municipalism": "Fully Automated Luxury Gay Space Communism",
-
-    "agrarian_socialism|Voluntaryism|progressive_conservatism|anarchism|communitarianism|Isolationism|conservationism|permissivism|municipalism": "Anarcho-Cottagecore",
-    "agrarian_socialism|Voluntaryism|progressive_conservatism|anarchism|communitarianism|Isolationism|environmentalism|permissivism|municipalism": "Anarcho-Cottagecore",
-    "distributism|flat_taxation|traditionalist_conservatism|anarcho_monarchism|communitarianism|Isolationism|neoluddism|civic_paternalism|regionalism": "Shirism",
-    "distributism|flat_taxation|traditionalist_conservatism|anarcho_monarchism|communitarianism|armed_neutrality|neoluddism|civic_paternalism|regionalism": "Shirism",
-    "free_socialism|collective_distribution|progressivism|technocracy|Cosmopolitanism|Non_Interventionism|prometheanism|civil_libertarianism|federalism": "Starfleetism",
-    "utopian_socialism|collective_distribution|progressivism|technocracy|Cosmopolitanism|Non_Interventionism|prometheanism|civil_libertarianism|federalism": "Starfleetism",
-    "feudalism|lvt|religious_traditionalism|religious_authoritarianism|Tribalism|Imperialism|neoluddism|disciplinarianism|confederalism": "Butlerianism",
-    "feudalism|lvt|religious_traditionalism|aristocracy|Tribalism|Imperialism|neoluddism|disciplinarianism|confederalism": "Butlerianism",
-    "welfare_capitalism|Progressive_Taxation|conservatism|stratocracy|civic_nationalism|Interventionism|industrialism|securitism|centralism": "Heinleinian Stratocracy",
-    "welfare_capitalism|Progressive_Taxation|conservatism|stratocracy|civic_nationalism|Realpolitik|industrialism|securitism|centralism": "Heinleinian Stratocracy",
-    "cameralism|collective_distribution|progressivism|technocracy|egoism|Globalism|posthumanism|civil_libertarianism|hypercentralism": "Singularitarianism",
-    "cameralism|collective_distribution|progressivism|technocracy|Cosmopolitanism|Globalism|posthumanism|civil_libertarianism|hypercentralism": "Singularitarianism"
+    "dirigisme|instrumentalism|regimentalism|centralism": "Soylentism"
 };
 
 const labelColors = {
@@ -1002,17 +976,7 @@ const labelColors = {
     "One State Benefactorism": "#4a708b",
     "Cyberpunk Corpostatism": "#822987",
     "Fireman Statism": "#a33612",
-    "Soylentism": "#4b6336",
-
-    /* Easter Eggs (mod) */
-    "Fully Automated Luxury Gay Space Communism": "#9b2f8fff",
-
-    "Anarcho-Cottagecore": "#6b8f5aff",
-    "Shirism": "#8a6d3bff",
-    "Starfleetism": "#2f6fb5ff",
-    "Butlerianism": "#a0522dff",
-    "Heinleinian Stratocracy": "#5b6b3aff",
-    "Singularitarianism": "#3a8f8aff"
+    "Soylentism": "#4b6336"
 };
 
 const descriptions = {
@@ -1365,16 +1329,7 @@ const descriptions = {
     "federalism": "A governance structure dividing political sovereignty between a central national government and autonomous regional states or provinces. Both levels possess constitutionally guaranteed spheres of authority, preventing either from unilaterally abolishing the other.",
     "regionalism": "A model based on a unitary state that grants substantial legislative, administrative, and cultural autonomy to distinct historical regions. While national sovereignty remains formally indivisible, regional parliaments manage local affairs through devolution.",
     "centralism": "A unitary republic where supreme legislative and administrative authority is concentrated in the national government. Sub-national divisions (such as provinces, prefectures, or departments) operate strictly as administrative extensions enforcing national law uniformly.",
-    "hypercentralism": "An extreme doctrine of absolute territorial uniformity and complete concentration of decision-making in the capital. It actively suppresses regional autonomy, local charters, and historical distinctions to ensure total central command over every administrative district.",
-
-    "Fully Automated Luxury Gay Space Communism": "A tongue-in-cheek, internet-born vision of a post-scarcity future. Automation and abundant energy abolish scarcity, wages and money, so goods are shared freely and the state withers into free communes. Everyone is at liberty to live and love as they please, and humanity spreads out among the stars. Originally a meme, it now doubles as shorthand for radically optimistic, technology-driven left politics.",
-
-    "Anarcho-Cottagecore": "A gentle, rural-aesthetic vision of stateless life: small self-governing communes, shared land, home-grown food, craft skills and mutual aid, with a strong preference for staying home. It mixes anarchist organization with a nostalgic, softly traditional taste for the countryside, and no one is forced to live any particular way.",
-    "Shirism": "Modeled on the Shire of Tolkien's hobbits: small family farms, widely spread property, a nominal and distant king, almost no government to speak of, and a strong dislike of adventures, outsiders and new machines. Order is kept mostly by custom, gossip and good manners, and second breakfast is considered a basic right.",
-    "Starfleetism": "Inspired by the United Federation of Planets: a post-scarcity, money-free society run by capable experts, with strong civil liberties, a loose federation of worlds, wide-ranging scientific optimism and a firm rule against meddling in other civilizations' development. Exploration and personal growth replace the pursuit of wealth.",
-    "Butlerianism": "Drawn from the Dune saga's great crusade against thinking machines. Feudal great houses, land-based wealth, a stern religious order and tribal loyalties hold an interstellar empire together, while any machine that imitates the human mind is forbidden. Human skill, discipline and faith take the place of automation.",
-    "Heinleinian Stratocracy": "The political order of Robert Heinlein's novel Starship Troopers, where full citizenship is earned through voluntary federal service rather than granted by birth. It pairs a civic, service-based nationalism with a government run by those who served. How the novel's system should be read, as admirable, satirical or something else, is still argued.",
-    "Singularitarianism": "The belief that accelerating artificial intelligence will lead to a sudden leap beyond human limits, and that society should be organized around that moment. In this vision, expert-run systems plan the economy, minds and machines blur together, individuals keep their personal freedoms, and one planet-wide coordinating system holds it all together."
+    "hypercentralism": "An extreme doctrine of absolute territorial uniformity and complete concentration of decision-making in the capital. It actively suppresses regional autonomy, local charters, and historical distinctions to ensure total central command over every administrative district."
 };
 
 const iconSources = {
